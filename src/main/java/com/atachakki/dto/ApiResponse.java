@@ -1,0 +1,44 @@
+package com.atachakki.dto;
+
+import java.time.LocalDateTime;
+
+public class ApiResponse<T> {
+
+    private final boolean success;
+    private final String message;
+    private final T data;
+    private final LocalDateTime timestamp;
+    private final String path;
+
+    public ApiResponse(boolean success, String message, T data, String path) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+        this.path = path;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    public ApiResponse(boolean success, String message, String path) {
+        this(success, message, null, path);
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public String getPath() {
+        return path;
+    }
+}
