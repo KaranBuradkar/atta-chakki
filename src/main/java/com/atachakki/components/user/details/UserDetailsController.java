@@ -33,14 +33,14 @@ public class UserDetailsController extends BaseController {
         return apiResponse(HttpStatus.FOUND, "UserDetails fetched successfully", response);
     }
 
-    @GetMapping("/1")
+    @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserDetailResponseDto>> fetchUserInfo() {
         UserDetailResponseDto responseDto = userInfoDetailsService.findUserInfos();
         return apiResponse(HttpStatus.FOUND,
                 "UserDetails fetched successfully", responseDto);
     }
 
-    @PatchMapping("/1")
+    @PatchMapping("/me")
     public ResponseEntity<ApiResponse<UserDetailResponseDto>> updateUserInfo(
             @RequestBody UserInfoUpdate updateRequest
     ) {
@@ -49,7 +49,7 @@ public class UserDetailsController extends BaseController {
                 "UserDetails fetched successfully", responseDto);
     }
 
-    @DeleteMapping("/1")
+    @DeleteMapping("/me")
     public ResponseEntity<ApiResponse<Void>> deleteUserInfo() {
         userInfoDetailsService.delete();
         return apiResponse(HttpStatus.OK,

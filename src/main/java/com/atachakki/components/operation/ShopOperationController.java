@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/shops/{shopId}/notifications")
+@RequestMapping("/v1/shops/{shopId}/shop-operations")
 public class ShopOperationController extends BaseController {
 
     private final ShopOperationService shopOperationService;
@@ -31,16 +31,16 @@ public class ShopOperationController extends BaseController {
             @RequestParam(value = "sort", defaultValue = "createdAt") String sort
     ) {
         Page<ShopOperationResponseDto> responseDto =
-                shopOperationService.findNotifications(shopId, page, size, direction, sort);
-        return apiResponse(HttpStatus.OK, "Notifications fetched successfully", responseDto);
+                shopOperationService.findShopOperation(shopId, page, size, direction, sort);
+        return apiResponse(HttpStatus.OK, "Shop operations fetched successfully", responseDto);
     }
 
-    @DeleteMapping("/{notificationId}")
-    public ResponseEntity<ApiResponse<Void>> deleteNotification(
+    @DeleteMapping("/{operationId}")
+    public ResponseEntity<ApiResponse<Void>> deleteOperationId(
             @PathVariable Long shopId,
-            @PathVariable Long notificationId
+            @PathVariable Long operationId
     ) {
-        shopOperationService.delete(shopId, notificationId);
-        return apiResponse(HttpStatus.OK, "Notification deleted successfully", null);
+        shopOperationService.delete(shopId, operationId);
+        return apiResponse(HttpStatus.OK, "Shop operation deleted successfully", null);
     }
 }

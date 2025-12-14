@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ShopOperationRepository extends JpaRepository<ShopOperation, Long> {
     Page<ShopOperation> findByShopId(Long shopId, PageRequest of);
 
-    boolean existsByIdAndShopId(Long notificationId, Long shopId);
+    boolean existsByIdAndShopId(Long operationId, Long shopId);
 }

@@ -8,5 +8,5 @@ public enum Module {
     STAFF,
     STAFF_PERMISSION,
     ORDER_ITEM_PRICE,
-    NOTIFICATION
+    OPERATION
 }

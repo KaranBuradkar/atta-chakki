@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ShopOperationService {
 
-    @PreAuthorize("@permissionGuard.check(#shopId, 'NOTIFICATION', 'READ')")
-    Page<ShopOperationResponseDto> findNotifications(
+    @PreAuthorize("@permissionGuard.check(#shopId, 'OPERATION', 'READ')")
+    Page<ShopOperationResponseDto> findShopOperation(
             Long shopId, Integer page, Integer size, String direction, String sort);
 
     void createModule(Long shopId, Module module, Long entityId, String afterValues);
@@ -21,5 +21,5 @@ public interface ShopOperationService {
     void deleteModule(Long shopId, Module module, Long entityId, String beforeValues);
 
     @IsAdminOrShopOwnerOrShopkeeper
-    void delete(Long shopId, Long notificationId);
+    void delete(Long shopId, Long operationId);
 }

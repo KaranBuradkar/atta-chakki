@@ -75,14 +75,14 @@ public class ShopOperationServiceImpl implements ShopOperationService {
     }
 
     @Override
-    public Page<ShopOperationResponseDto> findNotifications(
+    public Page<ShopOperationResponseDto> findShopOperation(
             Long shopId, Integer page, Integer size,
             String direction, String sort
     ) {
         Sort.Direction dir = ("asc".equalsIgnoreCase(direction)) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Page<ShopOperation> notifications = shopOperationRepository
+        Page<ShopOperation> operationPage = shopOperationRepository
                 .findByShopId(shopId, PageRequest.of(page, size, dir, sort));
-        return notifications.map(shopOperationMapper::toResponseDto);
+        return operationPage.map(shopOperationMapper::toResponseDto);
     }
 
     @Override
@@ -110,12 +110,12 @@ public class ShopOperationServiceImpl implements ShopOperationService {
 
     @Override
     @Transactional
-    public void delete(Long shopId, Long notificationId) {
-        if (shopOperationRepository.existsByIdAndShopId(notificationId, shopId)) {
-            shopOperationRepository.deleteById(notificationId);
+    public void delete(Long shopId, Long operationId) {
+        if (shopOperationRepository.existsByIdAndShopId(operationId, shopId)) {
+            shopOperationRepository.deleteById(operationId);
         } else {
-            log.warn("Notification not found");
-            throw new NotificationIdNotFound(notificationId);
+            log.warn("OperationId not found");
+            throw new NotificationIdNotFound(operationId);
         }
     }
 }
