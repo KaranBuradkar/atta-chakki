@@ -71,7 +71,9 @@ public class PaymentServiceImpl implements PaymentService {
     ) {
         Sort.Direction dir = ("asc".equalsIgnoreCase(direction)) ? Sort.Direction.ASC : Sort.Direction.DESC;
         Page<Payment> paymentsPage = paymentRepository
-                .findByDeletedFalseAndCustomerShopIdAndCustomerId(shopId, customerId, PageRequest.of(page, size, dir, sort));
+                .findByDeletedFalseAndCustomerShopIdAndCustomerId(
+                        shopId, customerId, PageRequest.of(page, size, dir, sort)
+                );
         return paymentsPage.map(paymentMapper::toResponseShortDto);
     }
 
@@ -98,7 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment entity = paymentMapper.toEntity(pay);
         entity.setReceiver(staff);
         entity.setCustomer(customer);
-        Payment save = paymentRepository.save(entity);
+        Payment newPayment = paymentRepository.save(entity);
 
         // update orders payment status
         orderPage.forEach(o -> o.setPaymentStatus(PaymentStatus.PAID));
@@ -111,8 +113,9 @@ public class PaymentServiceImpl implements PaymentService {
             dueOrRefundRepository.save(dueOrRefund);
         }
 
-        PaymentResponseDto responseDto = paymentMapper.toResponseDto(save);
-        shopOperationService.createModule(shopId, Module.PAYMENT, responseDto.id(), responseDto.toString());
+        PaymentResponseDto responseDto = paymentMapper.toResponseDto(newPayment);
+        shopOperationService.createModule(shopId, newPayment.getReceiver().getId(),
+                Module.PAYMENT, responseDto.id(), responseDto.toString());
         return responseDto;
     }
 
@@ -241,7 +244,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Payment updatedPayment = paymentRepository.save(payment);
         PaymentResponseDto responseDto = paymentMapper.toResponseDto(updatedPayment);
-        shopOperationService.updateModule(shopId, Module.PAYMENT, responseDto.id(),
+        shopOperationService.updateModule(shopId, getCurrentStaff(shopId).getId(), Module.PAYMENT, responseDto.id(),
                 fields.toString(), before.toString(), responseDto.toString());
         return responseDto;
     }
@@ -253,7 +256,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentResponseDto before = paymentMapper.toResponseDto(payment);
         payment.setDeleted(true);
         paymentRepository.save(payment);
-        shopOperationService.deleteModule(shopId, Module.PAYMENT,
+        shopOperationService.deleteModule(shopId, getCurrentStaff(shopId).getId(), Module.PAYMENT,
                 before.id(), before.toString());
     }
 

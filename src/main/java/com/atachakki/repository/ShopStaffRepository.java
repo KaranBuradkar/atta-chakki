@@ -12,7 +12,7 @@ public interface ShopStaffRepository extends JpaRepository<ShopStaff, Long> {
 
     Optional<ShopStaff> findByShopIdAndUserDetailUserUsernameAndActiveTrue(Long shopId, String username);
 
-    List<ShopStaff> findByUserDetailIdAndActiveTrue(Long userDetailsId);
+    Page<ShopStaff> findByUserDetailIdAndActiveTrue(Long userDetailsId, PageRequest pageRequest);
 
     Optional<ShopStaff> findByShopIdAndUserDetailUserIdAndActiveTrue(Long shopId, Long userId);
 

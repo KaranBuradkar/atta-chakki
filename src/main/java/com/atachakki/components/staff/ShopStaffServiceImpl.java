@@ -87,7 +87,7 @@ public class ShopStaffServiceImpl implements ShopStaffService {
         ShopStaff shopStaff = shopStaffRepository.save(entity);
         ShopStaffResponseDto responseDto = shopStaffMapper.toResponseDto(shopStaff);
 
-        shopOperationService.createModule(shopId, Module.STAFF, responseDto.id(), responseDto.toString());
+        shopOperationService.createModule(shopId, 99L, Module.STAFF, responseDto.id(), responseDto.toString());
         return responseDto;
     }
 
@@ -111,7 +111,7 @@ public class ShopStaffServiceImpl implements ShopStaffService {
         ShopStaff updated = shopStaffRepository.save(staff);
         ShopStaffResponseDto responseDto = shopStaffMapper.toResponseDto(updated);
 
-        shopOperationService.updateModule(shopId, Module.STAFF, responseDto.id(),
+        shopOperationService.updateModule(shopId, 99L, Module.STAFF, responseDto.id(),
                 fields.toString(), before.toString(), responseDto.toString());
         return responseDto;
     }
@@ -127,7 +127,7 @@ public class ShopStaffServiceImpl implements ShopStaffService {
         ShopStaffResponseDto before = shopStaffMapper.toResponseDto(staff);
         staff.setActive(false);
         shopStaffRepository.save(staff);
-        shopOperationService.deleteModule(shopId, Module.STAFF, before.id(), before.toString());
+        shopOperationService.deleteModule(shopId, 99L, Module.STAFF, before.id(), before.toString());
     }
 
     // Util methods

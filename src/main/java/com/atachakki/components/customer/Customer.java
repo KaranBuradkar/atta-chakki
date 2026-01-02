@@ -10,7 +10,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "customers")
+@Table(name = "customers",
+indexes = {
+        @Index(name = "idx_shop_deleted", columnList = "shop_id, deleted"),
+        @Index(name = "idx_shop_name_deleted", columnList = "shop_id, name, deleted"),
+        @Index(name = "idx_name_deleted", columnList = "name, deleted"),
+        @Index(name = "idx_id_shop", columnList = "id, shop_id", unique = true)
+})
 public class Customer {
 
     @Id

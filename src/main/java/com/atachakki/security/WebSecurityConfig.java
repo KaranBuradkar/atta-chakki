@@ -50,7 +50,7 @@ public class WebSecurityConfig {
                 })
                 // request validator
                 .authorizeHttpRequests(req -> { req
-                        .requestMatchers("/public/**", "/auth/register/**", "/auth/login/**"
+                        .requestMatchers( "/", "/public/**", "/auth/register/**", "/auth/login/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",

@@ -2,6 +2,11 @@ package com.atachakki.components.permissions;
 
 import com.atachakki.controller.BaseController;
 import com.atachakki.dto.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -11,8 +16,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(
+        name = "Staff Permission Module",
+        description = "APIs for managing staff permissions"
+)
 @RestController
-@CrossOrigin(value = {"http://localhost:5500"})
 @RequestMapping("/v1/shops/{shopId}/permissions")
 public class StaffPermissionController extends BaseController {
 
@@ -26,37 +34,107 @@ public class StaffPermissionController extends BaseController {
         this.staffPermissionService = staffPermissionService;
     }
 
+    @Operation(
+            summary = "Fetch staff permissions",
+            description = "Retrieve paginated permissions assigned to a staff member",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "302",
+                            description = "Permissions fetched successfully",
+                            content = @Content(
+                                    schema = @Schema(implementation = StaffPermissionResponseDto.class)
+                            )
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "404",
+                            description = "Staff or Shop not found"
+                    )
+            }
+    )
     @GetMapping("/staffs/{staffId}")
     public ResponseEntity<ApiResponse<Page<StaffPermissionResponseDto>>> fetchPermissions(
+            @Parameter(description = "Shop ID", example = "1", required = true)
             @PathVariable Long shopId,
+
+            @Parameter(description = "Staff ID", example = "20", required = true)
             @PathVariable Long staffId,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "10") Integer size,
-            @RequestParam(value = "direction", defaultValue = "asc") String direction,
-            @RequestParam(value = "sort", defaultValue = "module") String[] sort
+
+            @Parameter(description = "Page number (0-based)", example = "0")
+            @RequestParam(defaultValue = "0") Integer page,
+
+            @Parameter(description = "Page size", example = "10")
+            @RequestParam(defaultValue = "10") Integer size,
+
+            @Parameter(description = "Sort direction (asc / desc)", example = "asc")
+            @RequestParam(defaultValue = "asc") String direction,
+
+            @Parameter(
+                    description = "Sort fields",
+                    example = "module"
+            )
+            @RequestParam(defaultValue = "module") String[] sort
     ) {
-        Page<StaffPermissionResponseDto> responsePage = staffPermissionService
-                .findStaffPermissions(shopId, staffId, page, size, direction, sort);
-        return apiResponse(HttpStatus.FOUND, "permissions fetched successfully", responsePage);
+        Page<StaffPermissionResponseDto> responsePage =
+                staffPermissionService.findStaffPermissions(
+                        shopId, staffId, page, size, direction, sort
+                );
+
+        return apiResponse(HttpStatus.FOUND, "Permissions fetched successfully", responsePage);
     }
 
+    @Operation(
+            summary = "Grant staff permissions",
+            description = "Assign one or more permissions to a staff member",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "201",
+                            description = "Permissions granted successfully"
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid permission data"
+                    )
+            }
+    )
     @PostMapping("/staffs/{staffId}")
     public ResponseEntity<ApiResponse<List<StaffPermissionResponseDto>>> createPermissions(
-            @PathVariable(value = "shopId") Long shopId,
-            @PathVariable(value = "staffId") Long staffId,
+            @Parameter(description = "Shop ID", example = "1", required = true)
+            @PathVariable Long shopId,
+
+            @Parameter(description = "Staff ID", example = "20", required = true)
+            @PathVariable Long staffId,
+
             @RequestBody List<@Valid StaffPermissionRequestDto> requestDto
     ) {
         List<StaffPermissionResponseDto> responseDto =
                 staffPermissionService.create(shopId, staffId, requestDto);
+
         return apiResponse(HttpStatus.CREATED, "Permission granted successfully", responseDto);
     }
 
+    @Operation(
+            summary = "Revoke staff permission",
+            description = "Delete a specific permission assigned to a staff member",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "200",
+                            description = "Permission deleted successfully"
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "404",
+                            description = "Permission not found"
+                    )
+            }
+    )
     @DeleteMapping("/{permissionId}")
     public ResponseEntity<ApiResponse<Void>> deletePermissions(
-            @PathVariable(value = "shopId") Long shopId,
-            @PathVariable(value = "permissionId") Long permissionId
+            @Parameter(description = "Shop ID", example = "1", required = true)
+            @PathVariable Long shopId,
+
+            @Parameter(description = "Permission ID", example = "50", required = true)
+            @PathVariable Long permissionId
     ) {
         staffPermissionService.delete(shopId, permissionId);
-        return apiResponse(HttpStatus.CREATED, "Permission deleted successfully", null);
+        return apiResponse(HttpStatus.OK, "Permission deleted successfully", null);
     }
 }

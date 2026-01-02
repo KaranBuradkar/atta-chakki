@@ -12,6 +12,7 @@ import com.atachakki.entity.type.Module;
 import com.atachakki.entity.type.PermissionLevel;
 import com.atachakki.entity.type.StaffRole;
 import com.atachakki.exception.entityNotFound.ShopIdNotFoundException;
+import com.atachakki.exception.entityNotFound.UserDetailNotFoundException;
 import com.atachakki.exception.entityNotFound.UserDetailsNotFoundException;
 import com.atachakki.repository.ShopStaffRepository;
 import com.atachakki.repository.StaffPermissionRepository;
@@ -20,6 +21,9 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -57,11 +61,22 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public List<ShopShortResponseDto> getAllShops(Long userDetailsId) {
-        List<ShopStaff> shops = shopStaffRepository.findByUserDetailIdAndActiveTrue(userDetailsId);
-        return shops.stream()
-                .map(shopStaffMapper::toShortResponseDto)
-                .toList();
+    public Page<ShopShortResponseDto> getAllShops(int page, int size, String direction, String sort) {
+        Sort.Direction dir = ("asc".equalsIgnoreCase(direction)) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Page<ShopStaff> shops = shopStaffRepository
+                .findByUserDetailIdAndActiveTrue(currentUserDetailId(), PageRequest.of(page, size, dir, sort));
+        return shops.map(shopStaffMapper::toShortResponseDto);
+    }
+
+    private Long currentUserDetailId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        UserDetails userDetails = userDetailsRepository.findByUserId(user.getId())
+                .orElseThrow(() -> {
+                    log.warn("UserDetails not found");
+                    return new UserDetailNotFoundException("UserDetails not found");
+                });
+        return userDetails.getId();
     }
 
     @Override

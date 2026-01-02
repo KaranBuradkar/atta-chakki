@@ -1,7 +1,6 @@
-package com.atachakki.validation;
+package com.atachakki.validation.validator;
 
-import com.atachakki.exception.businessLogic.BusinessLogicException;
-import com.atachakki.exception.validation.PriceValidationException;
+import com.atachakki.validation.PriceFormat;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

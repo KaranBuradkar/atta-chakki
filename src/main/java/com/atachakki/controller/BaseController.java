@@ -13,7 +13,7 @@ public abstract class BaseController {
         this.request = request;
     }
 
-    public <T>ApiResponse<T> apiResponse(String message, T data) {
+    private <T>ApiResponse<T> apiResponse(String message, T data) {
         return new ApiResponse<>(true, message, data, request.getRequestURI());
     }
 

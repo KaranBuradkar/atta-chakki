@@ -45,16 +45,15 @@ public class ShopOperationServiceImpl implements ShopOperationService {
         this.shopStaffRepository = shopStaffRepository;
     }
 
-    private ShopStaff getCurrentStaff(Long shopId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = ((User) auth.getPrincipal()).getId(); // username stored in token
-        return shopStaffRepository.findByShopIdAndUserDetailUserIdAndActiveTrue(shopId, userId)
+    private ShopStaff getCurrentStaff(Long staffId, Long shopId) {
+        return shopStaffRepository.findByIdAndShopIdAndActiveTrue(staffId, shopId)
                 .orElseThrow(() -> new StaffNotFoundException("Staff not found for this shop"));
     }
 
     private void build(
-            Long shopId, Long entityId, Operation operation,
-            Module module, String changedFields,
+            Long shopId, Long entityId, Long staffId,
+            Operation operation, Module module,
+            String changedFields,
             String beforeValues, String afterValues
     ) {
         Shop shop = shopRepository.findById(shopId)
@@ -64,7 +63,7 @@ public class ShopOperationServiceImpl implements ShopOperationService {
                 });
         ShopOperation shopOperation = new ShopOperation();
         shopOperation.setShop(shop);
-        shopOperation.setSender(getCurrentStaff(shopId));
+        shopOperation.setSender(getCurrentStaff(staffId, shopId));
         shopOperation.setOperation(operation);
         shopOperation.setModule(module);
         shopOperation.setChangedFields(changedFields);
@@ -88,23 +87,23 @@ public class ShopOperationServiceImpl implements ShopOperationService {
     @Override
     @Transactional
     @Async
-    public void createModule(Long shopId, Module module, Long entityId, String afterValues) {
-        build(shopId, entityId, Operation.CREATE, module, null, null, afterValues);
+    public void createModule(Long shopId, Long staffId, Module module, Long entityId, String afterValues) {
+        build(shopId, entityId, staffId, Operation.CREATE, module, null, null, afterValues);
     }
 
     @Override
     @Transactional
     @Async
-    public void updateModule(Long shopId, Module module, Long entityId,
+    public void updateModule(Long shopId, Long staffId, Module module, Long entityId,
                              String changedFields, String beforeValues, String afterValues) {
-        build(shopId, entityId, Operation.UPDATE, module, changedFields, beforeValues, afterValues);
+        build(shopId, entityId, staffId, Operation.UPDATE, module, changedFields, beforeValues, afterValues);
     }
 
     @Override
     @Transactional
     @Async
-    public void deleteModule(Long shopId, Module module, Long entityId, String beforeValues) {
-        build(shopId, entityId, Operation.DELETE, module,
+    public void deleteModule(Long shopId, Long staffId, Module module, Long entityId, String beforeValues) {
+        build(shopId, entityId, staffId, Operation.DELETE, module,
                 "Customer deleted", beforeValues, null);
     }
 

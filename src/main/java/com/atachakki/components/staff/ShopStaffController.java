@@ -2,6 +2,9 @@ package com.atachakki.components.staff;
 
 import com.atachakki.controller.BaseController;
 import com.atachakki.dto.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -9,64 +12,119 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(
+        name = "Shop Staff Module",
+        description = "Operations related to shop staff management"
+)
 @RestController
 @RequestMapping("/v1/shops/{shopId}/staffs")
 public class ShopStaffController extends BaseController {
 
     private final ShopStaffService shopStaffService;
 
-    protected ShopStaffController(HttpServletRequest request, ShopStaffService shopStaffService) {
+    protected ShopStaffController(
+            HttpServletRequest request,
+            ShopStaffService shopStaffService
+    ) {
         super(request);
         this.shopStaffService = shopStaffService;
     }
 
+    @Operation(
+            summary = "Fetch shop staffs",
+            description = "Retrieve paginated list of staffs belonging to a shop"
+    )
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ShopStaffResponseDto>>> fetchShopStaffs(
+            @Parameter(description = "Shop ID", required = true)
             @PathVariable Long shopId,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "10") Integer size,
-            @RequestParam(value = "direction", defaultValue = "asc") String direction,
-            @RequestParam(value = "sort", defaultValue = "createdAt") String sort
+
+            @Parameter(description = "Page number", example = "0")
+            @RequestParam(defaultValue = "0") Integer page,
+
+            @Parameter(description = "Page size", example = "10")
+            @RequestParam(defaultValue = "10") Integer size,
+
+            @Parameter(description = "Sort direction (asc/desc)", example = "asc")
+            @RequestParam(defaultValue = "asc") String direction,
+
+            @Parameter(description = "Sort field", example = "createdAt")
+            @RequestParam(defaultValue = "createdAt") String sort
     ) {
-        Page<ShopStaffResponseDto> responsePage = shopStaffService
-                .findShopStaffs(shopId, page, size, direction, sort);
-        return apiResponse(HttpStatus.FOUND, "ShopStaff fetched successfully", responsePage);
+        Page<ShopStaffResponseDto> responsePage =
+                shopStaffService.findShopStaffs(shopId, page, size, direction, sort);
+
+        return apiResponse(HttpStatus.OK, "Shop staffs fetched successfully", responsePage);
     }
 
+    @Operation(
+            summary = "Fetch shop staff by ID",
+            description = "Retrieve a single shop staff by staff ID"
+    )
     @GetMapping("/{shopStaffId}")
     public ResponseEntity<ApiResponse<ShopStaffResponseDto>> fetchShopStaff(
+            @Parameter(description = "Shop ID", required = true)
             @PathVariable Long shopId,
+
+            @Parameter(description = "Shop Staff ID", required = true)
             @PathVariable Long shopStaffId
     ) {
-        ShopStaffResponseDto responseDto = shopStaffService.findShopStaff(shopId, shopStaffId);
-        return apiResponse(HttpStatus.OK, "shop staff updated successfully", responseDto);
+        ShopStaffResponseDto responseDto =
+                shopStaffService.findShopStaff(shopId, shopStaffId);
+
+        return apiResponse(HttpStatus.OK, "Shop staff fetched successfully", responseDto);
     }
 
+    @Operation(
+            summary = "Create shop staff",
+            description = "Register a new staff member for a shop"
+    )
     @PostMapping
     public ResponseEntity<ApiResponse<ShopStaffResponseDto>> createShopStaff(
+            @Parameter(description = "Shop ID", required = true)
             @PathVariable Long shopId,
+
             @Valid @RequestBody ShopStaffRequestDto requestDto
     ) {
-        ShopStaffResponseDto responseDto = shopStaffService.create(shopId, requestDto);
-        return apiResponse(HttpStatus.CREATED, "New shop staff register successfully", responseDto);
+        ShopStaffResponseDto responseDto =
+                shopStaffService.create(shopId, requestDto);
+
+        return apiResponse(HttpStatus.CREATED, "New shop staff registered successfully", responseDto);
     }
 
+    @Operation(
+            summary = "Update shop staff",
+            description = "Update details of an existing shop staff"
+    )
     @PatchMapping("/{shopStaffId}")
     public ResponseEntity<ApiResponse<ShopStaffResponseDto>> updateShopStaff(
+            @Parameter(description = "Shop ID", required = true)
             @PathVariable Long shopId,
+
+            @Parameter(description = "Shop Staff ID", required = true)
             @PathVariable Long shopStaffId,
+
             @RequestBody ShopStaffRequestDto requestDto
     ) {
-        ShopStaffResponseDto responseDto = shopStaffService.update(shopId, shopStaffId, requestDto);
-        return apiResponse(HttpStatus.OK, "shop staff updated successfully", responseDto);
+        ShopStaffResponseDto responseDto =
+                shopStaffService.update(shopId, shopStaffId, requestDto);
+
+        return apiResponse(HttpStatus.OK, "Shop staff updated successfully", responseDto);
     }
 
+    @Operation(
+            summary = "Delete shop staff",
+            description = "Remove a staff member from the shop"
+    )
     @DeleteMapping("/{shopStaffId}")
-    public ResponseEntity<ApiResponse<ShopStaffResponseDto>> deleteShopStaff(
+    public ResponseEntity<ApiResponse<Void>> deleteShopStaff(
+            @Parameter(description = "Shop ID", required = true)
             @PathVariable Long shopId,
+
+            @Parameter(description = "Shop Staff ID", required = true)
             @PathVariable Long shopStaffId
     ) {
         shopStaffService.deleteById(shopId, shopStaffId);
-        return apiResponse(HttpStatus.OK, "shop staff deleted successfully", null);
+        return apiResponse(HttpStatus.OK, "Shop staff deleted successfully", null);
     }
 }

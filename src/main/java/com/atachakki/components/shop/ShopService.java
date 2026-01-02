@@ -1,6 +1,7 @@
 package com.atachakki.components.shop;
 
 import com.atachakki.security.authorizationValidation.IsAdminOrShopOwnerOrShopkeeper;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +10,7 @@ import java.util.List;
 @Service
 public interface ShopService {
 
-    @PreAuthorize(value = "hasAnyRole('ADMIN') OR " +
-            "@securityService.isValidUserDetailsToUser(authentication.principal.id, #userDetailsId)")
-    List<ShopShortResponseDto> getAllShops(Long userDetailsId);
+    Page<ShopShortResponseDto> getAllShops(int page, int size, String direction, String sort);
 
     @PreAuthorize(value = "@permissionGuard.check(#shopId, 'SHOP', 'READ')")
     ShopResponseDto getShopDetails(Long shopId);

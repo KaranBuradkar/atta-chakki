@@ -91,7 +91,7 @@ public class OrderServiceImpl implements OrderService{
         // db operation and response creation
         Order newOrder = orderRepository.save(entity);
         OrderResponseDto responseDto = orderMapper.toResponseDto(newOrder);
-        shopOperationService.createModule(shopId, Module.ORDER, responseDto.id(), orderToString(responseDto));
+        shopOperationService.createModule(shopId, newOrder.getAddedBy().getId(), Module.ORDER, responseDto.id(), orderToString(responseDto));
         return responseDto;
     }
 
@@ -133,7 +133,8 @@ public class OrderServiceImpl implements OrderService{
         fields.append(", updatedBy]");
         Order updatedOrder = orderRepository.save(order);
         OrderResponseDto responseDto = orderMapper.toResponseDto(updatedOrder);
-        shopOperationService.updateModule(shopId, Module.ORDER, responseDto.id(), fields.toString(), orderToString(before), orderToString(responseDto));
+        shopOperationService.updateModule(shopId, updatedOrder.getUpdatedBy().getId(), Module.ORDER,
+                responseDto.id(), fields.toString(), orderToString(before), orderToString(responseDto));
         return responseDto;
     }
 
@@ -149,8 +150,9 @@ public class OrderServiceImpl implements OrderService{
         OrderResponseDto before = orderMapper.toResponseDto(order);
         order.setDeleted(true);
         order.setUpdatedBy(staff);
-        orderRepository.save(order);
-        shopOperationService.deleteModule(shopId, Module.ORDER, before.id(), orderToString(before));
+        Order deleted = orderRepository.save(order);
+        shopOperationService.deleteModule(shopId, deleted.getUpdatedBy().getId(), Module.ORDER,
+                before.id(), orderToString(before));
     }
 
     @Override
@@ -207,7 +209,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     private Order fetchOrderByIdAndShopId(Long orderId, Long shopId) {
-        return orderRepository.findByIdAndShopId(orderId, shopId)
+        return orderRepository.findByIdAndCustomerShopId(orderId, shopId)
                 .orElseThrow(() -> {
                     log.warn("Order not found with id");
                     return new OrderIdNotFoundException(orderId);

@@ -70,7 +70,7 @@ public class ShopOrderItemPriceServiceImpl implements ShopOrderItemPriceService 
         ShopOrderItemPrice orderItemPrice = shopOrderItemPriceRepository.save(entity);
         ShopOrderItemPriceResponseDto responseDto = shopOrderItemPriceMapper.toResponseDto(orderItemPrice);
 
-        shopOperationService.createModule(shopId, Module.ORDER_ITEM_PRICE, responseDto.id(), responseDto.toString());
+        shopOperationService.createModule(shopId, 1L, Module.ORDER_ITEM_PRICE, responseDto.id(), responseDto.toString());
         return responseDto;
     }
 
@@ -110,7 +110,7 @@ public class ShopOrderItemPriceServiceImpl implements ShopOrderItemPriceService 
         ShopOrderItemPrice updated = shopOrderItemPriceRepository.save(orderItemPrice);
         ShopOrderItemPriceResponseDto responseDto = shopOrderItemPriceMapper.toResponseDto(updated);
 
-        shopOperationService.updateModule(shopId, Module.ORDER_ITEM_PRICE, responseDto.id(),
+        shopOperationService.updateModule(shopId, 1L, Module.ORDER_ITEM_PRICE, responseDto.id(),
                 fields.toString(), before.toString(), responseDto.toString());
         return responseDto;
     }
@@ -121,7 +121,7 @@ public class ShopOrderItemPriceServiceImpl implements ShopOrderItemPriceService 
         ShopOrderItemPrice shopOrderItemPrice = fetchOrderItemPrice(orderItemPriceId, shopId);
         ShopOrderItemPriceResponseDto before = shopOrderItemPriceMapper.toResponseDto(shopOrderItemPrice);
         shopOrderItemPrice.setAvailable(false);
-        shopOperationService.deleteModule(shopId, Module.ORDER_ITEM_PRICE,
+        shopOperationService.deleteModule(shopId, 1L, Module.ORDER_ITEM_PRICE,
                 before.id(), before.toString());
     }
 

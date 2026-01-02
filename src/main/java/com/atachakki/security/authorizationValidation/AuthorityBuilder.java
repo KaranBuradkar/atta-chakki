@@ -1,8 +1,5 @@
 package com.atachakki.security.authorizationValidation;
 
-import com.atachakki.entity.type.Module;
-import com.atachakki.entity.type.PermissionLevel;
-
 public final class AuthorityBuilder {
 
     private AuthorityBuilder() {}

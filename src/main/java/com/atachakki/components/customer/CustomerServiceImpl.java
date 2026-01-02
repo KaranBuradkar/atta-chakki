@@ -88,7 +88,8 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setDeleted(false);
         Customer response = customerRepository.save(customer);
         CustomerResponseDto responseDto = customerMapper.toResponseDto(response);
-        shopOperationService.createModule(shopId, Module.CUSTOMER, responseDto.id(), stringCustomer(responseDto));
+        shopOperationService.createModule(shopId, response.getUpdatedBy().getId(), Module.CUSTOMER,
+                responseDto.id(), stringCustomer(responseDto));
         return responseDto;
     }
 
@@ -105,8 +106,11 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setUpdatedBy(staff);
         Customer updatedCustomer = customerRepository.save(customer);
         CustomerResponseDto responseDto = customerMapper.toResponseDto(updatedCustomer);
-        shopOperationService.updateModule(shopId, Module.CUSTOMER, responseDto.id(),
+
+        shopOperationService.updateModule(
+                shopId, updatedCustomer.getUpdatedBy().getId(), Module.CUSTOMER, responseDto.id(),
                 "[block, updatedBy]", stringCustomer(before), stringCustomer(responseDto));
+
         return responseDto;
     }
 
@@ -137,7 +141,8 @@ public class CustomerServiceImpl implements CustomerService {
         fields.append(", updatedBy]");
         Customer saveCustomer = customerRepository.save(customer);
         CustomerResponseDto responseDto = customerMapper.toResponseDto(saveCustomer);
-        shopOperationService.updateModule(shopId, Module.CUSTOMER, saveCustomer.getId(),
+        shopOperationService.updateModule(shopId, saveCustomer.getUpdatedBy().getId(),
+                Module.CUSTOMER, saveCustomer.getId(),
                 fields.toString(), stringCustomer(before), stringCustomer(responseDto));
         return responseDto;
     }
@@ -151,7 +156,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setDeleted(true);
         Customer deleted = customerRepository.save(customer);
         CustomerResponseDto responseDto = customerMapper.toResponseDto(deleted);
-        shopOperationService.deleteModule(shopId, Module.CUSTOMER,
+        shopOperationService.deleteModule(shopId, deleted.getUpdatedBy().getId(), Module.CUSTOMER,
                 responseDto.id(), stringCustomer(responseDto));
     }
 

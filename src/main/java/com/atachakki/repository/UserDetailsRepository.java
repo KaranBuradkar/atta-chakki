@@ -14,4 +14,6 @@ public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> 
   Optional<Boolean> existsByIdAndUserId(Long userDetailsId, Long userId);
 
   Optional<UserDetails> findByUserUsername(String email);
+
+  Optional<UserDetails> findByUserId(Long id);
 }

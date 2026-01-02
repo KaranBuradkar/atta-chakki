@@ -15,27 +15,10 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityService.class);
-    private final UserDetailsRepository userDetailsRepository;
     private final ShopRepository shopRepository;
 
-    public SecurityService(
-            UserDetailsRepository userDetailsRepository,
-            ShopRepository shopRepository
-    ) {
-        this.userDetailsRepository = userDetailsRepository;
+    public SecurityService(ShopRepository shopRepository) {
         this.shopRepository = shopRepository;
-    }
-
-    public boolean isValidUserDetailsToUser(Long userId, Long userDetailsId) {
-        return resolveUserAndUserDetailsId(userId, userDetailsId);
-    }
-
-    private boolean resolveUserAndUserDetailsId(Long userId, Long userDetailsId) {
-        return userDetailsRepository.existsByIdAndUserId(userDetailsId, userId)
-                .orElseThrow(() -> {
-                    log.warn("unauthorize user access denied with userId - {}", userId);
-                    return new AccessDeniedException("unauthorize user access denied with userId - "+userId);
-                });
     }
 
     public boolean isShopActive(Long shopId) {

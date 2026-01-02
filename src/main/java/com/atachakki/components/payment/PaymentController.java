@@ -1,9 +1,12 @@
 package com.atachakki.components.payment;
 
-import com.atachakki.components.order.OrderRequestDto;
-import com.atachakki.components.order.OrderResponseDto;
 import com.atachakki.controller.BaseController;
 import com.atachakki.dto.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -11,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(
+        name = "Payment Module",
+        description = "APIs for managing customer payments"
+)
 @RestController
 @RequestMapping("/v1/shops/{shopId}/payments")
 public class PaymentController extends BaseController {
@@ -25,57 +32,163 @@ public class PaymentController extends BaseController {
         this.paymentService = paymentService;
     }
 
+    @Operation(
+            summary = "Fetch customer payments",
+            description = "Retrieve paginated payment history for a customer",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "302",
+                            description = "Payments fetched successfully",
+                            content = @Content(
+                                    schema = @Schema(implementation = PaymentResponseShortDto.class)
+                            )
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "404",
+                            description = "Customer or Shop not found"
+                    )
+            }
+    )
     @GetMapping("/customers/{customerId}")
     public ResponseEntity<ApiResponse<Page<PaymentResponseShortDto>>> fetchPayments(
-            @PathVariable(value = "shopId") Long shopId,
-            @PathVariable(value = "customerId") Long customerId,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "20") Integer size,
-            @RequestParam(value = "dir", defaultValue = "desc") String direction,
-            @RequestParam(value = "sort", defaultValue = "createdAt") String sort
+            @Parameter(description = "Shop ID", example = "1", required = true)
+            @PathVariable Long shopId,
+
+            @Parameter(description = "Customer ID", example = "10", required = true)
+            @PathVariable Long customerId,
+
+            @Parameter(description = "Page number (0-based)", example = "0")
+            @RequestParam(defaultValue = "0") Integer page,
+
+            @Parameter(description = "Page size", example = "20")
+            @RequestParam(defaultValue = "20") Integer size,
+
+            @Parameter(description = "Sort direction (asc / desc)", example = "desc")
+            @RequestParam(defaultValue = "desc") String direction,
+
+            @Parameter(description = "Sort field", example = "createdAt")
+            @RequestParam(defaultValue = "createdAt") String sort
     ) {
-        Page<PaymentResponseShortDto> responseDtoPage = paymentService
-                .findPayments(shopId, customerId, page, size, direction, sort);
+        Page<PaymentResponseShortDto> responseDtoPage =
+                paymentService.findPayments(shopId, customerId, page, size, direction, sort);
+
         return apiResponse(HttpStatus.FOUND, "Payments fetched successfully", responseDtoPage);
     }
 
+    @Operation(
+            summary = "Fetch payment details",
+            description = "Retrieve details of a single payment by ID",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "200",
+                            description = "Payment fetched successfully",
+                            content = @Content(
+                                    schema = @Schema(implementation = PaymentResponseDto.class)
+                            )
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "404",
+                            description = "Payment not found"
+                    )
+            }
+    )
     @GetMapping("/{paymentId}")
     public ResponseEntity<ApiResponse<PaymentResponseDto>> fetchPayment(
-            @PathVariable(value = "shopId") Long shopId,
-            @PathVariable(value = "paymentId") Long paymentId
+            @Parameter(description = "Shop ID", example = "1", required = true)
+            @PathVariable Long shopId,
+
+            @Parameter(description = "Payment ID", example = "200", required = true)
+            @PathVariable Long paymentId
     ) {
-        PaymentResponseDto responseDto = paymentService
-                .findPayment(shopId, paymentId);
+        PaymentResponseDto responseDto =
+                paymentService.findPayment(shopId, paymentId);
+
         return apiResponse(HttpStatus.OK, "Payment fetched successfully", responseDto);
     }
 
+    @Operation(
+            summary = "Create payment",
+            description = "Create a new payment for a customer",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "201",
+                            description = "Payment created successfully"
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid request body"
+                    )
+            }
+    )
     @PostMapping("/customers/{customerId}")
     public ResponseEntity<ApiResponse<PaymentResponseDto>> createPayment(
-            @PathVariable(value = "shopId") Long shopId,
-            @PathVariable(value = "customerId") Long customerId,
+            @Parameter(description = "Shop ID", example = "1", required = true)
+            @PathVariable Long shopId,
+
+            @Parameter(description = "Customer ID", example = "10", required = true)
+            @PathVariable Long customerId,
+
             @Valid @RequestBody PaymentBundleRequestDto requestDto
     ) {
-        PaymentResponseDto responseDto = paymentService.create(shopId, customerId, requestDto);
+        PaymentResponseDto responseDto =
+                paymentService.create(shopId, customerId, requestDto);
+
         return apiResponse(HttpStatus.CREATED, "Payment successful", responseDto);
     }
 
+    @Operation(
+            summary = "Update payment",
+            description = "Update an existing payment",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "200",
+                            description = "Payment updated successfully"
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "404",
+                            description = "Payment not found"
+                    )
+            }
+    )
     @PatchMapping("/{paymentId}")
     public ResponseEntity<ApiResponse<PaymentResponseDto>> updatePayment(
-            @PathVariable(value = "shopId") Long shopId,
-            @PathVariable(value = "paymentId") Long paymentId,
+            @Parameter(description = "Shop ID", example = "1", required = true)
+            @PathVariable Long shopId,
+
+            @Parameter(description = "Payment ID", example = "200", required = true)
+            @PathVariable Long paymentId,
+
             @RequestBody PaymentRequestDto updateRequest
     ) {
-        PaymentResponseDto responseDto = paymentService.update(shopId, paymentId, updateRequest);
-        return apiResponse(HttpStatus.CREATED, "Payment updated successfully", responseDto);
+        PaymentResponseDto responseDto =
+                paymentService.update(shopId, paymentId, updateRequest);
+
+        return apiResponse(HttpStatus.OK, "Payment updated successfully", responseDto);
     }
 
+    @Operation(
+            summary = "Delete payment",
+            description = "Delete a payment transaction",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "200",
+                            description = "Payment deleted successfully"
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "404",
+                            description = "Payment not found"
+                    )
+            }
+    )
     @DeleteMapping("/{paymentId}")
     public ResponseEntity<ApiResponse<Void>> deletePayment(
-            @PathVariable(value = "shopId") Long shopId,
-            @PathVariable(value = "paymentId") Long paymentId
+            @Parameter(description = "Shop ID", example = "1", required = true)
+            @PathVariable Long shopId,
+
+            @Parameter(description = "Payment ID", example = "200", required = true)
+            @PathVariable Long paymentId
     ) {
         paymentService.deleteById(shopId, paymentId);
-        return apiResponse(HttpStatus.CREATED, "Payment transaction deleted successfully", null);
+        return apiResponse(HttpStatus.OK, "Payment transaction deleted successfully", null);
     }
-
 }

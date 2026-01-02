@@ -14,11 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Page<Order> findByCustomerId(Long customerId, PageRequest of);
 
-    @Query("select o from Order o " +
-            "where o.id = ?1 and o.customer.shop.id = ?2")
-    Optional<Order> findByIdAndShopId(Long orderId, Long shopId);
-
-    Page<Order> findAllByCustomerId(Long customerId, PageRequest of);
+    Optional<Order> findByIdAndCustomerShopId(Long orderId, Long shopId);
 
     @Query(value = "select sum(o.totalAmount) from Order o where o.customer.shop.id = ?1")
     BigDecimal findTotalDebt(Long shopId);

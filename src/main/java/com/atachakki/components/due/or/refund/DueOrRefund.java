@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "dues_And_refunds")
+@Table(name = "dues_and_refunds")
 public class DueOrRefund {
 
     @Id

@@ -1,5 +1,6 @@
 package com.atachakki.validation;
 
+import com.atachakki.validation.validator.PriceFormatValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

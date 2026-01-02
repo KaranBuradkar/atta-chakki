@@ -1,4 +1,4 @@
-package com.atachakki.security;
+package com.atachakki.security.auth;
 
 import com.atachakki.repository.UserRepository;
 import org.slf4j.Logger;
@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service(value = "authUserDetailService")
+@Service(value = "authUserDetailsService")
 public class AuthUserDetailsServiceImpl implements UserDetailsService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthUserDetailsServiceImpl.class);

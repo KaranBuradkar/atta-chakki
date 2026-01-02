@@ -127,7 +127,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) {
         Long shopId = extractShopId(request);
 
-        // staff authorities SHOP_12_CUSTOMER_FULL, SHOP_12_ORDER_READ
+        // staff authorities ex. SHOP_12_CUSTOMER_FULL, SHOP_12_ORDER_READ
         List<SimpleGrantedAuthority> authorities =
                 new ArrayList<>(getStaffAuthorities(shopId, user.getId()));
 
@@ -189,16 +189,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private boolean shouldSkip(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.startsWith("/swagger-ui") ||
+        return uri.isBlank() || uri.equals("/") ||
+                uri.startsWith("/swagger-ui") ||
                 uri.startsWith("/v3/api-docs") ||
                 uri.startsWith("/swagger-resources") ||
                 uri.startsWith("/webjars") ||
-                uri.startsWith("/v3/api-docs/swagger-config")
-                || uri.startsWith("/public")
-                || uri.startsWith("/auth/login")
-                || uri.startsWith("/auth/register")
-                || uri.startsWith("/oauth2")
-                || uri.startsWith("/login/oauth2")
-                || uri.startsWith("/error");
+                uri.startsWith("/v3/api-docs/swagger-config") ||
+                uri.startsWith("/public") ||
+                uri.startsWith("/auth/login") ||
+                uri.startsWith("/auth/register") ||
+                uri.startsWith("/oauth2") ||
+                uri.startsWith("/login/oauth2") ||
+                uri.startsWith("/error");
     }
 }

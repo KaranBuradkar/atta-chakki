@@ -1,7 +1,9 @@
 package com.atachakki.security.auth;
 
 import com.atachakki.entity.type.AuthProvider;
+import com.atachakki.validation.CustomUsername;
 import jakarta.validation.constraints.*;
+import org.hibernate.validator.constraints.Length;
 
 public class RegisterRequestDto {
 
@@ -9,12 +11,9 @@ public class RegisterRequestDto {
     @Size(min = 2, max = 50, message = "Name must be 2 to 50 characters")
     private String name;
 
-    @NotBlank
-    @Email(message = "Invalid email format")
-    @Pattern(
-            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
-            message = "Invalid email format"
-    )
+    @Email
+    @Length(min = 2, max = 100)
+    @NotBlank(message = "Email can not blank")
     private String username;
 
     @NotBlank(message = "Password is required")

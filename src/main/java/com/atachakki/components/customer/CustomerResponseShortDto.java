@@ -2,8 +2,6 @@ package com.atachakki.components.customer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.math.BigDecimal;
-
 public record CustomerResponseShortDto(
         @JsonProperty("customer_id") Long id,
         @JsonProperty("customer_name") String name,

@@ -11,14 +11,10 @@ public class CustomerRequestDto {
     @JsonProperty("customer_name") private String name;
 
     @NotNull(message = "Debt is required")
-    @DecimalMin(value = "0.0", inclusive = true, message = "Debt must be positive")
+    @DecimalMin(value = "0.0", message = "Debt must be positive")
     @JsonProperty("customer_debt") private BigDecimal debt;
 
     @Email(message = "Invalid email format")
-    @Pattern(
-            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
-            message = "Invalid email format"
-    )
     @JsonProperty("customer_email") private String email;
 
     @JsonProperty("customer_specification") private String specification;

@@ -6,6 +6,7 @@ import com.atachakki.exception.businessLogic.BusinessLogicException;
 import com.atachakki.exception.entityNotFound.EntityNotFoundException;
 import com.atachakki.exception.validation.InvalidJwtTokenException;
 import com.atachakki.exception.validation.ValidationException;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -146,12 +147,12 @@ public class GobleExceptionHandlerController {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse<String>> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
-        log.warn("Unsupported method", e);
+        log.warn("Request method not supported", e);
         String details = String.format(
                 "Method '%s' not supported for endpoint '%s'. Supported: %s",
                 e.getMethod(), request.getRequestURL(), e.getSupportedHttpMethods()
         );
-        return errorResponse(HttpStatus.BAD_REQUEST, "Unsupported request method", details);
+        return errorResponse(HttpStatus.BAD_REQUEST, "Request method not supported", details);
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -160,6 +161,13 @@ public class GobleExceptionHandlerController {
         return errorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                 "Media type not supported",
                 "Supported: " + supported);
+    }
+
+    @ExceptionHandler(ServletException.class)
+    public ResponseEntity<ErrorResponse<String>> handleServletException(ServletException e) {
+        log.error("unexpected servlet exception happened", e);
+        return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Servlet exception", null);
     }
 
     @ExceptionHandler(Exception.class)
